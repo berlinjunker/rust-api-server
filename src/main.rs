@@ -1,3 +1,4 @@
+use actix_web::{App, HttpServer, Responder, HttpResponse, get};
 use rustApp::models::*;
 use diesel::prelude::*;
 use dotenvy::dotenv;
@@ -12,7 +13,8 @@ pub fn establish_connection() -> PgConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
-fn main() {
+#[get("/")]
+async fn hello() -> impl Responder {
     use rustApp::schema::users::dsl::*;
 
     let connection = &mut establish_connection();
@@ -23,26 +25,8 @@ fn main() {
         .load(connection)
         .expect("Error loading users");
 
-    println!("Displaying {} users", results.len());
-    for user in results {
-        println!("{}", user.firstName);
-        println!("{}", user.lastName);
-        println!("{}", user.address);
-        println!("{}", user.country);
-        println!("-----------\n");
-    }
+    return HttpResponse::Ok().json(results);
 }
-
-// -----------------------------------------------------------------------------------
-
-// #[get("/")]
-// async fn hello() -> impl Responder {
-//     HttpResponse::Ok().body("
-//             <h1>
-//                 Hello World!
-//             </h1>
-//         ")
-// }
 
 // #[post("/echo")]
 // async fn echo(req_body: String) -> impl Responder {
@@ -53,15 +37,15 @@ fn main() {
 //     HttpResponse::Ok().body("Hey there!")
 // }
 
-// #[actix_web::main]
-// async fn main() -> std::io::Result<()> {
-//     HttpServer::new(|| {
-//         App::new()
-//             .service(hello)
-//             .service(echo)
-//             .route("/hey", web::get().to(manual_hello))
-//     })
-//     .bind(("127.0.0.1", 8080))?
-//     .run()
-//     .await
-// }
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(hello)
+            // .service(echo)
+            // .route("/hey", web::get().to(manual_hello))
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
+}
