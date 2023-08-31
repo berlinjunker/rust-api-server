@@ -1,8 +1,8 @@
 use actix_web::{App, HttpServer, Responder, HttpResponse, get, post, delete, patch, web, Result};
-use rustApp::{models::*, create_user_in_db, schema::users::{self, firstName}};
+use rustApp::{models::*, create_user_in_db, schema::users::firstName};
 use diesel::prelude::*;
 use dotenvy::dotenv;
-use std::{env};
+use std::env;
 use diesel::pg::PgConnection;
 
 pub fn establish_connection() -> PgConnection {
