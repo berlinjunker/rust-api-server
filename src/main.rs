@@ -1,8 +1,10 @@
-use actix_web::{App, HttpServer, Responder, HttpResponse, get, post, delete, patch, web, Result};
+use actix_files as fs;
+use actix_web::{App, HttpServer, Responder, HttpResponse, get, post, delete, patch, web, Result, HttpRequest};
+use actix_files::NamedFile;
 use rustApp::{models::*, create_user_in_db, schema::users::firstName};
 use diesel::prelude::*;
 use dotenvy::dotenv;
-use std::env;
+use std::{env, path::PathBuf};
 use diesel::pg::PgConnection;
 
 pub fn establish_connection() -> PgConnection {
@@ -13,7 +15,7 @@ pub fn establish_connection() -> PgConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
-#[get("/")]
+// #[get("/")]
 async fn get_users() -> impl Responder {
     use rustApp::schema::users::dsl::*;
 
@@ -67,15 +69,29 @@ async fn update_user(path: web::Path<i32>) -> Result<String> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // HttpServer::new(|| {
+    //     App::new()
+    //         .service(get_users)
+    //         .service(create_user)
+    //         .service(delete_user)
+    //         .service(update_user)
+    //         // .route("/hey", web::get().to(manual_hello))
+    // })
+    // .bind(("127.0.0.1", 8080))?
+    // .run()
+    // .await
+
     HttpServer::new(|| {
         App::new()
-            .service(get_users)
-            .service(create_user)
-            .service(delete_user)
-            .service(update_user)
-            // .route("/hey", web::get().to(manual_hello))
+            .route("/user", web::get().to(get_users))
+            .service(
+            fs::Files::new("/", "./www")
+                .show_files_listing()
+                .index_file("index.html")
+                .use_last_modified(true),
+        )
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind("0.0.0.0:8080")?
     .run()
     .await
 }
