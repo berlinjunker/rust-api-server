@@ -1,0 +1,28 @@
+/* *** CSS pseudo-classes *** */
+:host {
+    /* Selects the shadow host of the shadow DOM containing the CSS it is used inside. */
+    display: block;
+    border: 1px solid red; /* Drop this line if you don't like red boxes ;-) */
+}
+
+/* :defined 
+    Matches any element that is defined, including built in elements and custom elements defined with CustomElementRegistry.define()).
+*/
+
+/* :host() 
+    Selects the shadow host of the shadow DOM containing the CSS it is used inside (so you can select a custom element from inside its shadow DOM) but only if the selector given as the function's parameter matches the shadow host.
+*/
+
+/* :host-context() 
+    Selects the shadow host of the shadow DOM containing the CSS it is used inside (so you can select a custom element from inside its shadow DOM) but only if the selector given as the function's parameter matches the shadow host's ancestor(s) in the place it sits inside the DOM hierarchy.
+*/
+
+/* *** CSS pseudo-elements ***
+    Pseudo-elements relating specifically to custom elements:
+*/
+/* ::part
+    Represents any element within a shadow tree that has a matching part attribute.
+*/
+/* ::slotted
+    Matches any content that is inserted into a slot.
+*/

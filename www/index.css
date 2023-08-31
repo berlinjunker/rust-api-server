@@ -1,0 +1,19 @@
+:root{
+    --color-fg: #fff;
+    --color-bg: #000;
+    --color-green-mid: #80ff8060;
+    --color-green-dark: #80ff8040;
+
+    --font-family-normal : sans-serif;
+}
+* {
+    box-sizing: border-box;
+}
+html body {
+    box-sizing: border-box;
+    color: var(--color-fg);
+    background-color: var(--color-bg);
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family-normal);
+}
