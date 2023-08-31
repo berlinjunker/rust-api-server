@@ -119,6 +119,10 @@ export default class UserList extends HTMLElement {
     }
 
     renderData() {
+        if (!Array.isArray(this.data)) {
+            return
+        }
+        
         if (this.refTBody.hasChildNodes) {
             // delete child Rows
             this.refTBody.childNodes.forEach(elem => elem.remove())
