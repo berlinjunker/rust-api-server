@@ -128,10 +128,13 @@ export default class UserList extends HTMLElement {
             this.refTBody.childNodes.forEach(elem => elem.remove())
         }
 
-        let refTr = document.createElement('tr')
+        
 
         //
         this.data.forEach(row => {
+            let refTr = document.createElement('tr')
+
+
             let refTd = document.createElement('td')
             refTd.textContent = row.id
             refTr.appendChild(refTd)  
@@ -163,10 +166,12 @@ export default class UserList extends HTMLElement {
             refTd = document.createElement('td')
             refTd.textContent = row.country
             refTr.appendChild(refTd)
+
+            this.refTBody.appendChild(refTr)
         })
         //
 
-        this.refTBody.appendChild(refTr)
+       
     }
 }
 // Register custom element.
