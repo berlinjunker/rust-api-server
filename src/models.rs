@@ -14,3 +14,16 @@ pub struct User {
     pub postalZip: String,
     pub country: String,
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::users)]
+pub struct NewUser<'a> {
+    pub id: &'a i32,
+    pub firstName: &'a str,
+    pub lastName: &'a str,
+    pub phone: &'a str,
+    pub email: &'a str,
+    pub address: &'a str,
+    pub postalZip: &'a str,
+    pub country: &'a str,
+}

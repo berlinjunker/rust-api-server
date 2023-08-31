@@ -1,5 +1,5 @@
-use actix_web::{App, HttpServer, Responder, HttpResponse, get, post, delete, patch};
-use rustApp::models::*;
+use actix_web::{App, HttpServer, Responder, HttpResponse, get, post, delete, patch, web, Result};
+use rustApp::{models::*, create_user_in_db};
 use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;
@@ -29,8 +29,10 @@ async fn get_users() -> impl Responder {
 }
 
 #[post("/")]
-async fn create_user(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body("create user")
+async fn create_user(req_body: web::Json<User>) -> Result<String> {
+    let connection = &mut establish_connection();
+    let user = create_user_in_db(connection, req_body);
+    return Ok(String::from(format!("Created user, Welcome {}", user.firstName)));
 }
 
 #[delete("/")]
