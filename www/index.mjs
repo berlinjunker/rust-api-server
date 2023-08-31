@@ -1,4 +1,4 @@
 import TechdayRust from "./components/techday-rust/TechdayRust.mjs"
 
-let refCleverLaden = document.createElement(CleverLaden.tag)
-document.body.appendChild(refCleverLaden)
+let refTechdayRust = document.createElement(TechdayRust.tag)
+document.body.appendChild(refTechdayRust)
