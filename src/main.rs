@@ -1,8 +1,8 @@
 use actix_web::{App, HttpServer, Responder, HttpResponse, get, post, delete, patch, web, Result};
-use rustApp::{models::*, create_user_in_db};
+use rustApp::{models::*, create_user_in_db, schema::users::{self, firstName}};
 use diesel::prelude::*;
 use dotenvy::dotenv;
-use std::env;
+use std::{env};
 use diesel::pg::PgConnection;
 
 pub fn establish_connection() -> PgConnection {
@@ -40,9 +40,21 @@ async fn delete_user(id: String) -> impl Responder {
     HttpResponse::Ok().body("delete user")
 }
 
-#[patch("/")]
-async fn update_user(id: String) -> impl Responder {
-    HttpResponse::Ok().body("update user")
+#[patch("/{id}")]
+async fn update_user(path: web::Path<i32>) -> Result<String> {
+    let id = path.into_inner();
+
+    use rustApp::schema::users::dsl::users;
+
+    let connection = &mut establish_connection();
+
+    let post = diesel::update(users.find(id))
+        .set(firstName.eq("Klaus"))
+        .returning(User::as_returning())
+        .get_result(connection)
+        .unwrap();
+
+    Ok(format!("Updated user_id {}!", post.id))
 }
 
 #[actix_web::main]
