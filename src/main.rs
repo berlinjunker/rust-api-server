@@ -1,5 +1,5 @@
-use actix_web::{App, HttpServer, Responder, HttpResponse, get};
-use rustApp::models::*;
+use actix_web::{App, HttpServer, Responder, HttpResponse, get, post, delete, patch, web, Result};
+use rustApp::{models::*, create_user_in_db, schema::users::firstName};
 use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;
@@ -14,7 +14,7 @@ pub fn establish_connection() -> PgConnection {
 }
 
 #[get("/")]
-async fn hello() -> impl Responder {
+async fn get_users() -> impl Responder {
     use rustApp::schema::users::dsl::*;
 
     let connection = &mut establish_connection();
@@ -28,21 +28,51 @@ async fn hello() -> impl Responder {
     return HttpResponse::Ok().json(results);
 }
 
-// #[post("/echo")]
-// async fn echo(req_body: String) -> impl Responder {
-//     HttpResponse::Ok().body(req_body)
-// }
+#[post("/")]
+async fn create_user(req_body: web::Json<User>) -> Result<String> {
+    let connection = &mut establish_connection();
+    let user = create_user_in_db(connection, req_body);
+    return Ok(String::from(format!("Created user, Welcome {}", user.firstName)));
+}
 
-// async fn manual_hello() -> impl Responder {
-//     HttpResponse::Ok().body("Hey there!")
-// }
+#[delete("/{id_to_delete}")]
+async fn delete_user(path: web::Path<i32>) -> impl Responder {
+    use rustApp::schema::users::dsl::*;
+    let connection = &mut establish_connection();
+
+    let id_to_delete = path.into_inner();
+
+    diesel::delete(users.find(id_to_delete))
+        .execute(connection)
+        .expect("Error deleting users");
+    HttpResponse::Ok().body("delete user")
+}
+
+#[patch("/{id}")]
+async fn update_user(path: web::Path<i32>) -> Result<String> {
+    let id = path.into_inner();
+
+    use rustApp::schema::users::dsl::users;
+
+    let connection = &mut establish_connection();
+
+    let post = diesel::update(users.find(id))
+        .set(firstName.eq("Klaus"))
+        .returning(User::as_returning())
+        .get_result(connection)
+        .unwrap();
+
+    Ok(format!("Updated user_id {}!", post.id))
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .service(hello)
-            // .service(echo)
+            .service(get_users)
+            .service(create_user)
+            .service(delete_user)
+            .service(update_user)
             // .route("/hey", web::get().to(manual_hello))
     })
     .bind(("127.0.0.1", 8080))?
