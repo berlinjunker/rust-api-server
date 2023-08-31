@@ -35,8 +35,16 @@ async fn create_user(req_body: web::Json<User>) -> Result<String> {
     return Ok(String::from(format!("Created user, Welcome {}", user.firstName)));
 }
 
-#[delete("/")]
-async fn delete_user(id: String) -> impl Responder {
+#[delete("/{id_to_delete}")]
+async fn delete_user(path: web::Path<i32>) -> impl Responder {
+    use rustApp::schema::users::dsl::*;
+    let connection = &mut establish_connection();
+
+    let id_to_delete = path.into_inner();
+
+    diesel::delete(users.find(id_to_delete))
+        .execute(connection)
+        .expect("Error deleting users");
     HttpResponse::Ok().body("delete user")
 }
 
